@@ -1,1 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EZRA Coaching Needs Classifier</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; }
 
+  .header { background: #1a1a1a; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+  .header-logo { color: #f5e642; font-size: 22px; font-weight: 700; letter-spacing: 2px; }
+  .header-tag { color: #888; font-size: 12px; }
+
+  .hero { background: #1a1a1a; color: white; padding: 3rem 2rem 2rem; text-align: center; border-bottom: 3px solid #f5e642; }
+  .hero h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+  .hero p { color: #aaa; font-size: 15px; max-width: 520px; margin: 0 auto; }
+
+  .governance { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; padding: 1.5rem 2rem; background: #f0efe8; border-bottom: 1px solid #ddd; }
+  .gov-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; background: white; border: 1px solid #ddd; border-radius: 20px; padding: 5px 12px; }
+  .gov-pill span { color: #2d7a2d; font-weight: 700; }
+  .gov-pill span.no { color: #c0392b; }
+
+  .main { max-width: 760px; margin: 0 auto; padding: 2rem 1rem; }
+
+  .progress-bar { display: flex; align-items: center; gap: 0; margin-bottom: 2rem; }
+  .step-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; border: 2px solid #ddd; background: white; color: #aaa; flex-shrink: 0; transition: all 0.3s; }
+  .step-dot.active { background: #f5e642; border-color: #f5e642; color: #1a1a1a; }
+  .step-dot.done { background: #1a1a1a; border-color: #1a1a1a; color: #f5e642; }
+  .step-line { flex: 1; height: 2px; background: #ddd; transition: all 0.3s; }
+  .step-line.done { background: #1a1a1a; }
+
+  .card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; padding: 2rem; margin-bottom: 1.5rem; }
+  .card h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+  .card .sub { font-size: 13px; color: #777; margin-bottom: 1.5rem; }
+
+  .question { margin-bottom: 1.5rem; }
+  .question label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .opt { padding: 12px 14px; border: 1.5px solid #e0e0e0; border-radius: 8px; cursor: pointer; font-size: 13px; background: white; text-align: left; transition: all 0.2s; color: #1a1a1a; }
+  .opt:hover { border-color: #f5e642; background: #fffde7; }
+  .opt.selected { border-color: #1a1a1a; background: #1a1a1a; color: #f5e642; font-weight: 500; }
+
+  .btn { padding: 12px 28px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; }
+  .btn-primary { background: #f5e642; color: #1a1a1a; }
+  .btn-primary:hover { background: #e8d800; }
+  .btn-primary:disabled { background: #e0e0e0; color: #aaa; cursor: not-allowed; }
+  .btn-secondary { background: white; color: #1a1a1a; border: 1.5px solid #ddd; }
+  .btn-secondary:hover { border-color: #1a1a1a; }
+
+  .result-card { background: white; border-radius: 12px; border: 2px solid #f5e642; padding: 2rem; margin-bottom: 1rem; }
+  .product-badge { display: inline-block; background: #1a1a1a; color: #f5e642; font-size: 13px; font-weight: 700; padding: 5px 14px; border-radius: 20px; margin-bottom: 1rem; letter-spacing: 1px; }
+  .result-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .result-card .desc { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 1.5rem; }
+
+  .confidence { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+  .confidence-label { font-size: 13px; color: #777; min-width: 100px; }
+  .confidence-track { flex: 1; height: 6px; background: #f0f0f0; border-radius: 3px; }
+  .confidence-fill { height: 100%; border-radius: 3px; background: #f5e642; transition: width 0.8s ease; }
+  .confidence-pct { font-size: 14px; font-weight: 600; min-width: 36px; }
+
+  .rationale { background: #f9f9f6; border-left: 3px solid #f5e642; border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+  .rationale h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 8px; }
+  .rationale ul { list-style: none; padding: 0; }
+  .rationale ul li { font-size: 13px; color: #444; padding: 3px 0; padding-left: 18px; position: relative; line-height: 1.5; }
+  .rationale ul li::before { content: '→'; position: absolute; left: 0; color: #f5e642; font-weight: 700; }
+
+  .commercial { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+  .com-box { background: #f9f9f6; border-radius: 8px; padding: 12px; text-align: center; border: 1px solid #eee; }
+  .com-box .val { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+  .com-box .lbl { font-size: 11px; color: #888; margin-top: 3px; }
+
+  .governance-log { background: #1a1a1a; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+  .governance-log h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #f5e642; margin-bottom: 10px; }
+  .log-entry { font-size: 12px; color: #aaa; padding: 3px 0; font-family: monospace; }
+  .log-entry .ts { color: #555; margin-right: 8px; }
+  .log-entry .val { color: #f5e642; }
+
+  .override-box { border: 1.5px dashed #ddd; border-radius: 8px; padding: 1rem 1.25rem; }
+  .override-box h4 { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #555; }
+  .override-box p { font-size: 12px; color: #888; margin-bottom: 10px; line-height: 1.5; }
+  .override-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .override-btn { padding: 7px 14px; border: 1.5px solid #ddd; border-radius: 6px; background: white; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+  .override-btn:hover { border-color: #1a1a1a; background: #f9f9f6; }
+
+  .alt-card { background: white; border-radius: 10px; border: 1px solid #e0e0e0; padding: 1.25rem; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+  .alt-card .alt-name { font-size: 14px; font-weight: 600; }
+  .alt-card .alt-why { font-size: 12px; color: #888; margin-top: 3px; }
+  .alt-card .alt-score { font-size: 20px; font-weight: 700; color: #ccc; }
+
+  .hidden { display: none; }
+  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #aaa; margin-bottom: 10px; }
+
+  @media (max-width: 500px) {
+    .options { grid-template-columns: 1fr; }
+    .commercial { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">EZRA</div>
+  <div class="header-tag">Coaching Needs Classifier · Operational Agent v1.0</div>
+</div>
+
+<div class="hero">
+  <h1>Match the right coaching product to every client</h1>
+  <p>A governed AI agent that classifies client need and recommends the right EZRA product — consistently, at scale, with a full audit trail.</p>
+</div>
+
+<div class="governance">
+  <div class="gov-pill"><span>✓</span> Shows reasoning for every decision</div>
+  <div class="gov-pill"><span>✓</span> Confidence scored on every output</div>
+  <div class="gov-pill"><span>✓</span> Human override always available</div>
+  <div class="gov-pill"><span>✓</span> Full audit log generated</div>
+  <div class="gov-pill"><span class="no">✗</span> Never recommends without rationale</div>
+  <div class="gov-pill"><span class="no">✗</span> Never locks out human judgment</div>
+</div>
+
+<div class="main">
+
+  <!-- Progress -->
+  <div class="progress-bar" id="progress">
+    <div class="step-dot active" id="dot1">1</div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-dot" id="dot2">2</div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-dot" id="dot3">3</div>
+    <div class="step-line" id="line3"></div>
+    <div class="step-dot" id="dot4">4</div>
+  </div>
+
+  <!-- Step 1 -->
+  <div id="step1" class="card">
+    <h2>Who is this coaching for?</h2>
+    <p class="sub">Tell the agent about the client's audience and context.</p>
+    <div class="question">
+      <label>Audience level</label>
+      <div class="options">
+        <button class="opt" onclick="select(this,'audience','frontline')">Frontline / Individual contributors</button>
+        <button class="opt" onclick="select(this,'audience','manager')">First-time or mid-level managers</button>
+        <button class="opt" onclick="select(this,'audience','senior')">Senior leaders / Directors</button>
+        <button class="opt" onclick="select(this,'audience','executive')">C-suite / Executive team</button>
+      </div>
+    </div>
+    <div class="question">
+      <label>Organisation size</label>
+      <div class="options">
+        <button class="opt" onclick="select(this,'orgsize','small')">Under 500 employees</button>
+        <button class="opt" onclick="select(this,'orgsize','mid')">500 – 5,000 employees</button>
+        <button class="opt" onclick="select(this,'orgsize','large')">5,000 – 50,000 employees</button>
+        <button class="opt" onclick="select(this,'orgsize','enterprise')">50,000+ employees (enterprise)</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="next1" onclick="goStep(2)" disabled>Next →</button>
+  </div>
+
+  <!-- Step 2 -->
+  <div id="step2" class="card hidden">
+    <h2>What is the coaching trying to achieve?</h2>
+    <p class="sub">Select the primary business challenge this engagement needs to solve.</p>
+    <div class="question">
+      <label>Primary goal</label>
+      <div class="options">
+        <button class="opt" onclick="select(this,'goal','performance')">Drive high performance culture</button>
+        <button class="opt" onclick="select(this,'goal','change')">Support change and transformation</button>
+        <button class="opt" onclick="select(this,'goal','leadership')">Develop leadership capability</button>
+        <button class="opt" onclick="select(this,'goal','talent')">Accelerate emerging talent</button>
+        <button class="opt" onclick="select(this,'goal','wellbeing')">Improve wellbeing and resilience</button>
+        <button class="opt" onclick="select(this,'goal','specific')">Address a specific behaviour or skill</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-secondary" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary" id="next2" onclick="goStep(3)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div id="step3" class="card hidden">
+    <h2>Scale and urgency</h2>
+    <p class="sub">Help the agent assess commercial scope and timeline pressure.</p>
+    <div class="question">
+      <label>Number of participants</label>
+      <div class="options">
+        <button class="opt" onclick="select(this,'participants','1to10')">1 – 10 people</button>
+        <button class="opt" onclick="select(this,'participants','10to50')">10 – 50 people</button>
+        <button class="opt" onclick="select(this,'participants','50to200')">50 – 200 people</button>
+        <button class="opt" onclick="select(this,'participants','200plus')">200+ people</button>
+      </div>
+    </div>
+    <div class="question">
+      <label>Timeline</label>
+      <div class="options">
+        <button class="opt" onclick="select(this,'timeline','immediate')">Immediate — within 4 weeks</button>
+        <button class="opt" onclick="select(this,'timeline','quarter')">This quarter — 1 to 3 months</button>
+        <button class="opt" onclick="select(this,'timeline','halfyear')">Next 3 – 6 months</button>
+        <button class="opt" onclick="select(this,'timeline','planned')">Planning ahead — 6 months+</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-secondary" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-primary" id="next3" onclick="goStep(4)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div id="step4" class="card hidden">
+    <h2>Previous coaching experience</h2>
+    <p class="sub">This affects onboarding complexity and product fit.</p>
+    <div class="question">
+      <label>Has this organisation used coaching at scale before?</label>
+      <div class="options">
+        <button class="opt" onclick="select(this,'experience','none')">No — first coaching programme</button>
+        <button class="opt" onclick="select(this,'experience','some')">Some — limited or ad hoc coaching</button>
+        <button class="opt" onclick="select(this,'experience','established')">Yes — established coaching culture</button>
+        <button class="opt" onclick="select(this,'experience','mature')">Mature — coaching embedded in L&D strategy</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-secondary" onclick="goStep(3)">← Back</button>
+      <button class="btn btn-primary" id="next4" onclick="classify()" disabled>Classify →</button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="result" class="hidden">
+
+    <div class="result-card">
+      <div class="product-badge" id="res-badge">EZRA EDGE</div>
+      <h2 id="res-title">Recommended product</h2>
+      <p class="desc" id="res-desc">Description loads here.</p>
+
+      <div class="confidence">
+        <span class="confidence-label">Match confidence</span>
+        <div class="confidence-track"><div class="confidence-fill" id="conf-fill" style="width:0%"></div></div>
+        <span class="confidence-pct" id="conf-pct">0%</span>
+      </div>
+
+      <div class="rationale">
+        <h4>Why this recommendation</h4>
+        <ul id="rationale-list"></ul>
+      </div>
+
+      <div class="section-label">Commercial indicators</div>
+      <div class="commercial">
+        <div class="com-box"><div class="val" id="com-margin">High</div><div class="lbl">Margin potential</div></div>
+        <div class="com-box"><div class="val" id="com-churn">Low</div><div class="lbl">Churn risk if matched</div></div>
+        <div class="com-box"><div class="val" id="com-upsell">Medium</div><div class="lbl">Upsell pathway</div></div>
+      </div>
+
+      <div class="governance-log">
+        <h4>Audit log</h4>
+        <div id="log-entries"></div>
+      </div>
+
+      <div class="override-box">
+        <h4>Human override</h4>
+        <p>The agent's recommendation is advisory. A human must approve before this is presented to the client. Override below if your judgment differs.</p>
+        <div class="override-btns">
+          <button class="override-btn" onclick="override('EZRA Edge')">Override → EZRA Edge</button>
+          <button class="override-btn" onclick="override('EZRA Focus')">Override → EZRA Focus</button>
+          <button class="override-btn" onclick="override('EZRAx')">Override → EZRAx</button>
+          <button class="override-btn" onclick="override('Escalate to Solutions Team')">Escalate to solutions team</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:1.5rem">Alternative products considered</div>
+    <div id="alternatives"></div>
+
+    <button class="btn btn-secondary" onclick="restart()" style="margin-top:1rem">← Start new classification</button>
+  </div>
+
+</div>
+
+<script>
+  const answers = {};
+
+  function select(el, key, val) {
+    const parent = el.closest('.question');
+    parent.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    answers[key] = val;
+    checkStep();
+  }
+
+  function checkStep() {
+    const s1 = answers.audience && answers.orgsize;
+    const s2 = answers.goal;
+    const s3 = answers.participants && answers.timeline;
+    const s4 = answers.experience;
+    if (document.getElementById('next1')) document.getElementById('next1').disabled = !s1;
+    if (document.getElementById('next2')) document.getElementById('next2').disabled = !s2;
+    if (document.getElementById('next3')) document.getElementById('next3').disabled = !s3;
+    if (document.getElementById('next4')) document.getElementById('next4').disabled = !s4;
+  }
+
+  function goStep(n) {
+    [1,2,3,4].forEach(i => {
+      document.getElementById('step'+i).classList.add('hidden');
+      const dot = document.getElementById('dot'+i);
+      dot.classList.remove('active','done');
+      if (i < n) { dot.classList.add('done'); dot.textContent = '✓'; }
+      else if (i === n) dot.classList.add('active');
+      else { dot.textContent = i; }
+      if (i < 4) {
+        const line = document.getElementById('line'+i);
+        line.classList.toggle('done', i < n);
+      }
+    });
+    document.getElementById('step'+n).classList.remove('hidden');
+    checkStep();
+  }
+
+  function classify() {
+    [1,2,3,4].forEach(i => {
+      const dot = document.getElementById('dot'+i);
+      dot.classList.remove('active');
+      dot.classList.add('done');
+      dot.textContent = '✓';
+      if (i < 4) document.getElementById('line'+i).classList.add('done');
+    });
+    ['step1','step2','step3','step4'].forEach(s => document.getElementById(s).classList.add('hidden'));
+
+    const a = answers;
+    let product, confidence, desc, rationale, margin, churn, upsell, alts;
+
+    // Core classification logic
+    if (a.audience === 'executive' || (a.audience === 'senior' && a.orgsize === 'enterprise')) {
+      product = 'EZRAx';
+      confidence = 92;
+      desc = 'EZRAx is EZRA\'s premium executive coaching experience, designed exclusively for C-suite and senior leaders. It delivers elevated 1:1 coaching with enhanced features, premium coach matching, and executive-grade insights — the right product for this audience level and organisational complexity.';
+      rationale = [
+        'Executive or senior audience requires premium coach quality and elevated experience',
+        'EZRAx provides enhanced features specifically designed for top-tier leaders',
+        'Commercial risk of under-serving this audience is high — EZRAx protects retention',
+        a.experience === 'mature' ? 'Mature coaching culture indicates readiness for the executive tier' : 'Even early-stage organisations benefit from EZRAx at executive level'
+      ];
+      margin = 'Very High'; churn = 'Very Low'; upsell = 'High';
+      alts = [
+        { name: 'EZRA Edge', score: 58, why: 'Could serve seniors but lacks executive-grade features' },
+        { name: 'EZRA Focus', score: 34, why: 'Too narrow in scope for executive leadership development' }
+      ];
+    } else if (a.goal === 'specific' || (a.participants === '1to10' && a.timeline !== 'planned')) {
+      product = 'EZRA Focus';
+      confidence = 88;
+      desc = 'EZRA Focus is an 8-10 week targeted intervention combining 1:1 coaching with behavioural nudges. It\'s the right product when the client has a specific behaviour or skill to address, a defined cohort, and a clear outcome to measure — making ROI straightforward to demonstrate.';
+      rationale = [
+        'Specific behavioural goal is best served by a structured, time-bound intervention',
+        '8-10 week sprint format aligns to the timeline and participant scope described',
+        'Behavioural nudge component accelerates habit formation beyond pure coaching',
+        'Defined outcome makes it easy to demonstrate measurable impact to the client'
+      ];
+      margin = 'High'; churn = 'Low'; upsell = 'Very High';
+      alts = [
+        { name: 'EZRA Edge', score: 61, why: 'More open-ended — harder to demonstrate specific ROI' },
+        { name: 'EZRAx', score: 22, why: 'Over-engineered for this scope and audience level' }
+      ];
+    } else {
+      product = 'EZRA Edge';
+      confidence = a.orgsize === 'enterprise' || a.participants === '200plus' ? 91 : 82;
+      desc = 'EZRA Edge is EZRA\'s flagship unlimited 1:1 coaching platform — the right product for organisations scaling coaching across a broad population with diverse needs. It supports multiple use cases, audience levels, and development goals simultaneously, making it the most commercially scalable choice.';
+      rationale = [
+        'Broad audience or multiple development goals require a flexible, scalable platform',
+        'Unlimited 1:1 sessions provide the depth needed for sustained behaviour change',
+        a.orgsize === 'large' || a.orgsize === 'enterprise' ? 'Large enterprise scale makes Edge the most operationally efficient choice' : 'Mid-market scale benefits from Edge\'s flexibility as coaching needs evolve',
+        a.experience === 'none' || a.experience === 'some' ? 'New coaching cultures benefit from Edge\'s accessibility and ease of adoption' : 'Established coaching culture can maximise utilisation of the Edge platform'
+      ];
+      margin = a.participants === '200plus' ? 'Very High' : 'High';
+      churn = 'Low'; upsell = 'High';
+      alts = [
+        { name: 'EZRA Focus', score: 55, why: 'Better if a single specific behaviour was the primary goal' },
+        { name: 'EZRAx', score: 38, why: 'More appropriate if audience were exclusively executive level' }
+      ];
+    }
+
+    // Populate result
+    document.getElementById('res-badge').textContent = product.toUpperCase();
+    document.getElementById('res-title').textContent = product + ' recommended';
+    document.getElementById('res-desc').textContent = desc;
+    document.getElementById('com-margin').textContent = margin;
+    document.getElementById('com-churn').textContent = churn;
+    document.getElementById('com-upsell').textContent = upsell;
+
+    const list = document.getElementById('rationale-list');
+    list.innerHTML = '';
+    rationale.forEach(r => { const li = document.createElement('li'); li.textContent = r; list.appendChild(li); });
+
+    setTimeout(() => {
+      document.getElementById('conf-fill').style.width = confidence + '%';
+      document.getElementById('conf-pct').textContent = confidence + '%';
+    }, 200);
+
+    const now = new Date();
+    const ts = now.toTimeString().slice(0,8);
+    const logs = [
+      { ts, key: 'audience', val: a.audience },
+      { ts, key: 'org_size', val: a.orgsize },
+      { ts, key: 'goal', val: a.goal },
+      { ts, key: 'participants', val: a.participants },
+      { ts, key: 'timeline', val: a.timeline },
+      { ts, key: 'experience', val: a.experience },
+      { ts, key: 'classification', val: product },
+      { ts, key: 'confidence', val: confidence + '%' },
+      { ts, key: 'status', val: 'AWAITING_HUMAN_APPROVAL' }
+    ];
+    const logEl = document.getElementById('log-entries');
+    logEl.innerHTML = '';
+    logs.forEach(l => {
+      const d = document.createElement('div');
+      d.className = 'log-entry';
+      d.innerHTML = `<span class="ts">[${l.ts}]</span>${l.key}: <span class="val">${l.val}</span>`;
+      logEl.appendChild(d);
+    });
+
+    const altEl = document.getElementById('alternatives');
+    altEl.innerHTML = '';
+    alts.forEach(alt => {
+      const d = document.createElement('div');
+      d.className = 'alt-card';
+      d.innerHTML = `<div><div class="alt-name">${alt.name}</div><div class="alt-why">${alt.why}</div></div><div class="alt-score">${alt.score}%</div>`;
+      altEl.appendChild(d);
+    });
+
+    document.getElementById('result').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function override(choice) {
+    const log = document.getElementById('log-entries');
+    const now = new Date().toTimeString().slice(0,8);
+    const d = document.createElement('div');
+    d.className = 'log-entry';
+    d.innerHTML = `<span class="ts">[${now}]</span>human_override: <span class="val">${choice}</span>`;
+    log.appendChild(d);
+    document.getElementById('res-badge').textContent = choice.toUpperCase();
+    document.getElementById('res-title').textContent = choice + ' (human override)';
+    alert('Override recorded in audit log: ' + choice);
+  }
+
+  function restart() {
+    Object.keys(answers).forEach(k => delete answers[k]);
+    document.getElementById('result').classList.add('hidden');
+    [1,2,3,4].forEach(i => {
+      const dot = document.getElementById('dot'+i);
+      dot.classList.remove('done','active');
+      dot.textContent = i;
+      if (i < 4) document.getElementById('line'+i).classList.remove('done');
+      document.getElementById('step'+i).querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+    });
+    document.getElementById('dot1').classList.add('active');
+    document.getElementById('step1').classList.remove('hidden');
+    checkStep();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
