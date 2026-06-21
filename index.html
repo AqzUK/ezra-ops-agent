@@ -415,14 +415,9 @@
       logEl.appendChild(d);
     });
 
-    const altEl = document.getElementById('alternatives');
-    altEl.innerHTML = '';
-    alts.forEach(alt => {
-      const d = document.createElement('div');
-      d.className = 'alt-card';
-      d.innerHTML = `<div><div class="alt-name">${alt.name}</div><div class="alt-why">${alt.why}</div></div><div class="alt-score">${alt.score}%</div>`;
-      altEl.appendChild(d);
-    });
+document.getElementById('result').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
     document.getElementById('result').classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
