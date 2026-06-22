@@ -7,101 +7,82 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; }
-
   .header { background: #1a1a1a; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
   .header-logo { color: #f5e642; font-size: 22px; font-weight: 700; letter-spacing: 2px; }
   .header-tag { color: #888; font-size: 12px; }
-
   .hero { background: #1a1a1a; color: white; padding: 3rem 2rem 2rem; text-align: center; border-bottom: 3px solid #f5e642; }
   .hero h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
   .hero p { color: #aaa; font-size: 15px; max-width: 520px; margin: 0 auto; }
-
   .governance { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; padding: 1.5rem 2rem; background: #f0efe8; border-bottom: 1px solid #ddd; }
   .gov-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; background: white; border: 1px solid #ddd; border-radius: 20px; padding: 5px 12px; }
   .gov-pill span { color: #2d7a2d; font-weight: 700; }
   .gov-pill span.no { color: #c0392b; }
-
   .main { max-width: 760px; margin: 0 auto; padding: 2rem 1rem; }
-
   .progress-bar { display: flex; align-items: center; gap: 0; margin-bottom: 2rem; }
   .step-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; border: 2px solid #ddd; background: white; color: #aaa; flex-shrink: 0; transition: all 0.3s; }
   .step-dot.active { background: #f5e642; border-color: #f5e642; color: #1a1a1a; }
   .step-dot.done { background: #1a1a1a; border-color: #1a1a1a; color: #f5e642; }
   .step-line { flex: 1; height: 2px; background: #ddd; transition: all 0.3s; }
   .step-line.done { background: #1a1a1a; }
-
   .card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; padding: 2rem; margin-bottom: 1.5rem; }
   .card h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
   .card .sub { font-size: 13px; color: #777; margin-bottom: 1.5rem; }
-
   .question { margin-bottom: 1.5rem; }
   .question label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 10px; }
   .options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .opt { padding: 12px 14px; border: 1.5px solid #e0e0e0; border-radius: 8px; cursor: pointer; font-size: 13px; background: white; text-align: left; transition: all 0.2s; color: #1a1a1a; }
   .opt:hover { border-color: #f5e642; background: #fffde7; }
   .opt.selected { border-color: #1a1a1a; background: #1a1a1a; color: #f5e642; font-weight: 500; }
-
   .btn { padding: 12px 28px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; }
   .btn-primary { background: #f5e642; color: #1a1a1a; }
   .btn-primary:hover { background: #e8d800; }
   .btn-primary:disabled { background: #e0e0e0; color: #aaa; cursor: not-allowed; }
   .btn-secondary { background: white; color: #1a1a1a; border: 1.5px solid #ddd; }
   .btn-secondary:hover { border-color: #1a1a1a; }
-
   .result-card { background: white; border-radius: 12px; border: 2px solid #f5e642; padding: 2rem; margin-bottom: 1rem; }
   .product-badge { display: inline-block; background: #1a1a1a; color: #f5e642; font-size: 13px; font-weight: 700; padding: 5px 14px; border-radius: 20px; margin-bottom: 1rem; letter-spacing: 1px; }
   .result-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
   .result-card .desc { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 1.5rem; }
-
   .confidence { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
   .confidence-label { font-size: 13px; color: #777; min-width: 100px; }
   .confidence-track { flex: 1; height: 6px; background: #f0f0f0; border-radius: 3px; }
   .confidence-fill { height: 100%; border-radius: 3px; background: #f5e642; transition: width 0.8s ease; }
   .confidence-pct { font-size: 14px; font-weight: 600; min-width: 36px; }
-
   .rationale { background: #f9f9f6; border-left: 3px solid #f5e642; border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
   .rationale h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 8px; }
   .rationale ul { list-style: none; padding: 0; }
   .rationale ul li { font-size: 13px; color: #444; padding: 3px 0; padding-left: 18px; position: relative; line-height: 1.5; }
   .rationale ul li::before { content: '→'; position: absolute; left: 0; color: #f5e642; font-weight: 700; }
-
+  .escalation-alert { background: #fff5f5; border: 1.5px solid #e74c3c; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 13px; color: #c0392b; line-height: 1.6; }
   .commercial { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
   .com-box { background: #f9f9f6; border-radius: 8px; padding: 12px; text-align: center; border: 1px solid #eee; }
   .com-box .val { font-size: 20px; font-weight: 700; color: #1a1a1a; }
   .com-box .lbl { font-size: 11px; color: #888; margin-top: 3px; }
-
   .governance-log { background: #1a1a1a; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
   .governance-log h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #f5e642; margin-bottom: 10px; }
   .log-entry { font-size: 12px; color: #aaa; padding: 3px 0; font-family: monospace; }
   .log-entry .ts { color: #555; margin-right: 8px; }
   .log-entry .val { color: #f5e642; }
-
   .override-box { border: 1.5px dashed #ddd; border-radius: 8px; padding: 1rem 1.25rem; }
   .override-box h4 { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #555; }
   .override-box p { font-size: 12px; color: #888; margin-bottom: 10px; line-height: 1.5; }
   .override-btns { display: flex; gap: 8px; flex-wrap: wrap; }
   .override-btn { padding: 7px 14px; border: 1.5px solid #ddd; border-radius: 6px; background: white; font-size: 12px; cursor: pointer; transition: all 0.2s; }
   .override-btn:hover { border-color: #1a1a1a; background: #f9f9f6; }
-
   .alt-card { background: white; border-radius: 10px; border: 1px solid #e0e0e0; padding: 1.25rem; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
   .alt-card .alt-name { font-size: 14px; font-weight: 600; }
   .alt-card .alt-why { font-size: 12px; color: #888; margin-top: 3px; }
   .alt-card .alt-score { font-size: 20px; font-weight: 700; color: #ccc; }
-
   .hidden { display: none; }
   .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #aaa; margin-bottom: 10px; }
-
-  @media (max-width: 500px) {
-    .options { grid-template-columns: 1fr; }
-    .commercial { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 500px) { .options { grid-template-columns: 1fr; } .commercial { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="header-logo">EZRA</div>
-  <div class="header-tag">Built by Aquib Zahid &nbsp;·&nbsp; Operational Excellence Demo</div>
+  <div class="header-tag">Built by Aquib Zaman &nbsp;·&nbsp; Operational Excellence Demo</div>
 </div>
 
 <div class="hero">
@@ -114,13 +95,13 @@
   <div class="gov-pill"><span>✓</span> Confidence scored on every output</div>
   <div class="gov-pill"><span>✓</span> Human override always available</div>
   <div class="gov-pill"><span>✓</span> Full audit log generated</div>
+  <div class="gov-pill"><span>✓</span> Auto-escalates below 60% confidence</div>
   <div class="gov-pill"><span class="no">✗</span> Never recommends without rationale</div>
   <div class="gov-pill"><span class="no">✗</span> Never locks out human judgment</div>
 </div>
 
 <div class="main">
 
-  <!-- Progress -->
   <div class="progress-bar" id="progress">
     <div class="step-dot active" id="dot1">1</div>
     <div class="step-line" id="line1"></div>
@@ -131,7 +112,6 @@
     <div class="step-dot" id="dot4">4</div>
   </div>
 
-  <!-- Step 1 -->
   <div id="step1" class="card">
     <h2>Who is this coaching for?</h2>
     <p class="sub">Tell the agent about the client's audience and context.</p>
@@ -156,7 +136,6 @@
     <button class="btn btn-primary" id="next1" onclick="goStep(2)" disabled>Next →</button>
   </div>
 
-  <!-- Step 2 -->
   <div id="step2" class="card hidden">
     <h2>What is the coaching trying to achieve?</h2>
     <p class="sub">Select the primary business challenge this engagement needs to solve.</p>
@@ -177,7 +156,6 @@
     </div>
   </div>
 
-  <!-- Step 3 -->
   <div id="step3" class="card hidden">
     <h2>Scale and urgency</h2>
     <p class="sub">Help the agent assess commercial scope and timeline pressure.</p>
@@ -205,7 +183,6 @@
     </div>
   </div>
 
-  <!-- Step 4 -->
   <div id="step4" class="card hidden">
     <h2>Previous coaching experience</h2>
     <p class="sub">This affects onboarding complexity and product fit.</p>
@@ -224,37 +201,31 @@
     </div>
   </div>
 
-  <!-- Result -->
   <div id="result" class="hidden">
-
     <div class="result-card">
       <div class="product-badge" id="res-badge">EZRA EDGE</div>
       <h2 id="res-title">Recommended product</h2>
-      <p class="desc" id="res-desc">Description loads here.</p>
-
+      <p class="desc" id="res-desc"></p>
+      <div id="escalation-alert" class="escalation-alert hidden"></div>
       <div class="confidence">
         <span class="confidence-label">Match confidence</span>
         <div class="confidence-track"><div class="confidence-fill" id="conf-fill" style="width:0%"></div></div>
         <span class="confidence-pct" id="conf-pct">0%</span>
       </div>
-
       <div class="rationale">
         <h4>Why this recommendation</h4>
         <ul id="rationale-list"></ul>
       </div>
-
       <div class="section-label">Commercial indicators</div>
       <div class="commercial">
         <div class="com-box"><div class="val" id="com-margin">High</div><div class="lbl">Margin potential</div></div>
         <div class="com-box"><div class="val" id="com-churn">Low</div><div class="lbl">Churn risk if matched</div></div>
         <div class="com-box"><div class="val" id="com-upsell">Medium</div><div class="lbl">Upsell pathway</div></div>
       </div>
-
       <div class="governance-log">
         <h4>Audit log</h4>
         <div id="log-entries"></div>
       </div>
-
       <div class="override-box">
         <h4>Human override</h4>
         <p>The agent's recommendation is advisory. A human must approve before this is presented to the client. Override below if your judgment differs.</p>
@@ -266,10 +237,8 @@
         </div>
       </div>
     </div>
-
     <div class="section-label" style="margin-top:1.5rem">Alternative products considered</div>
     <div id="alternatives"></div>
-
     <button class="btn btn-secondary" onclick="restart()" style="margin-top:1rem">← Start new classification</button>
   </div>
 
@@ -305,10 +274,7 @@
       if (i < n) { dot.classList.add('done'); dot.textContent = '✓'; }
       else if (i === n) dot.classList.add('active');
       else { dot.textContent = i; }
-      if (i < 4) {
-        const line = document.getElementById('line'+i);
-        line.classList.toggle('done', i < n);
-      }
+      if (i < 4) document.getElementById('line'+i).classList.toggle('done', i < n);
     });
     document.getElementById('step'+n).classList.remove('hidden');
     checkStep();
@@ -327,11 +293,10 @@
     const a = answers;
     let product, confidence, desc, rationale, margin, churn, upsell, alts;
 
-    // Core classification logic
     if (a.audience === 'executive' || (a.audience === 'senior' && a.orgsize === 'enterprise')) {
       product = 'EZRAx';
       confidence = 92;
-      desc = 'EZRAx is EZRA\'s premium executive coaching experience, designed exclusively for C-suite and senior leaders. It delivers elevated 1:1 coaching with enhanced features, premium coach matching, and executive-grade insights — the right product for this audience level and organisational complexity.';
+      desc = 'EZRAx is EZRA\'s premium executive coaching experience, designed exclusively for C-suite and senior leaders. It delivers elevated 1:1 coaching with enhanced features, premium coach matching, and executive-grade insights.';
       rationale = [
         'Executive or senior audience requires premium coach quality and elevated experience',
         'EZRAx provides enhanced features specifically designed for top-tier leaders',
@@ -346,7 +311,7 @@
     } else if (a.goal === 'specific' || (a.participants === '1to10' && a.timeline !== 'planned')) {
       product = 'EZRA Focus';
       confidence = 88;
-      desc = 'EZRA Focus is an 8-10 week targeted intervention combining 1:1 coaching with behavioural nudges. It\'s the right product when the client has a specific behaviour or skill to address, a defined cohort, and a clear outcome to measure — making ROI straightforward to demonstrate.';
+      desc = 'EZRA Focus is an 8-10 week targeted intervention combining 1:1 coaching with behavioural nudges — the right product when the client has a specific behaviour to address and a clear outcome to measure.';
       rationale = [
         'Specific behavioural goal is best served by a structured, time-bound intervention',
         '8-10 week sprint format aligns to the timeline and participant scope described',
@@ -361,7 +326,7 @@
     } else {
       product = 'EZRA Edge';
       confidence = a.orgsize === 'enterprise' || a.participants === '200plus' ? 91 : 82;
-      desc = 'EZRA Edge is EZRA\'s flagship unlimited 1:1 coaching platform — the right product for organisations scaling coaching across a broad population with diverse needs. It supports multiple use cases, audience levels, and development goals simultaneously, making it the most commercially scalable choice.';
+      desc = 'EZRA Edge is EZRA\'s flagship unlimited 1:1 coaching platform — the right product for organisations scaling coaching across a broad population with diverse needs and development goals.';
       rationale = [
         'Broad audience or multiple development goals require a flexible, scalable platform',
         'Unlimited 1:1 sessions provide the depth needed for sustained behaviour change',
@@ -376,10 +341,23 @@
       ];
     }
 
-    // Populate result
-    document.getElementById('res-badge').textContent = product.toUpperCase();
-    document.getElementById('res-title').textContent = product + ' recommended';
-    document.getElementById('res-desc').textContent = desc;
+    // ESCALATION TRIGGER — fires if confidence below 60%
+    const escalationAlert = document.getElementById('escalation-alert');
+    if (confidence < 60) {
+      document.getElementById('res-badge').textContent = '⚠ ESCALATION REQUIRED';
+      document.getElementById('res-badge').style.background = '#c0392b';
+      document.getElementById('res-title').textContent = 'Insufficient confidence — human review required';
+      document.getElementById('res-desc').textContent = 'The agent could not classify this client need with sufficient confidence. No recommendation has been made. This case has been automatically flagged for the Solutions Team.';
+      escalationAlert.textContent = '⚠ Escalation trigger fired: Confidence score fell below the 60% governance threshold. Per agent rules, no product recommendation has been made. The Solutions Team must review this case before any client-facing output is produced.';
+      escalationAlert.classList.remove('hidden');
+    } else {
+      escalationAlert.classList.add('hidden');
+      document.getElementById('res-badge').textContent = product.toUpperCase();
+      document.getElementById('res-badge').style.background = '#1a1a1a';
+      document.getElementById('res-title').textContent = product + ' recommended';
+      document.getElementById('res-desc').textContent = desc;
+    }
+
     document.getElementById('com-margin').textContent = margin;
     document.getElementById('com-churn').textContent = churn;
     document.getElementById('com-upsell').textContent = upsell;
@@ -390,6 +368,7 @@
 
     setTimeout(() => {
       document.getElementById('conf-fill').style.width = confidence + '%';
+      document.getElementById('conf-fill').style.background = confidence < 60 ? '#e74c3c' : '#f5e642';
       document.getElementById('conf-pct').textContent = confidence + '%';
     }, 200);
 
@@ -402,9 +381,9 @@
       { ts, key: 'participants', val: a.participants },
       { ts, key: 'timeline', val: a.timeline },
       { ts, key: 'experience', val: a.experience },
-      { ts, key: 'classification', val: product },
+      { ts, key: 'classification', val: confidence < 60 ? 'ESCALATED' : product },
       { ts, key: 'confidence', val: confidence + '%' },
-      { ts, key: 'status', val: 'AWAITING_HUMAN_APPROVAL' }
+      { ts, key: 'status', val: confidence < 60 ? 'ESCALATED_TO_SOLUTIONS_TEAM' : 'AWAITING_HUMAN_APPROVAL' }
     ];
     const logEl = document.getElementById('log-entries');
     logEl.innerHTML = '';
@@ -415,9 +394,14 @@
       logEl.appendChild(d);
     });
 
-document.getElementById('result').classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+    const altEl = document.getElementById('alternatives');
+    altEl.innerHTML = '';
+    alts.forEach(alt => {
+      const d = document.createElement('div');
+      d.className = 'alt-card';
+      d.innerHTML = `<div><div class="alt-name">${alt.name}</div><div class="alt-why">${alt.why}</div></div><div class="alt-score">${alt.score}%</div>`;
+      altEl.appendChild(d);
+    });
 
     document.getElementById('result').classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -438,6 +422,7 @@ document.getElementById('result').classList.remove('hidden');
   function restart() {
     Object.keys(answers).forEach(k => delete answers[k]);
     document.getElementById('result').classList.add('hidden');
+    document.getElementById('escalation-alert').classList.add('hidden');
     [1,2,3,4].forEach(i => {
       const dot = document.getElementById('dot'+i);
       dot.classList.remove('done','active');
